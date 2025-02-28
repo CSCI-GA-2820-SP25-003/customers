@@ -25,11 +25,12 @@ from unittest import TestCase
 from wsgi import app
 from service.common import status
 from service.models import db, Customer
+from .factories import CustomerFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
-
+BASE_URL = "/customers"
 
 ######################################################################
 #  T E S T   C A S E S
@@ -73,3 +74,24 @@ class TestYourResourceService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     # Todo: Add your test cases here...
+    def test_create_Customer(self):
+        """It should Create a new Customer"""
+        test_Customer = CustomerFactory()
+        logging.debug("Test Customer: %s", test_Customer.serialize())
+        response = self.client.post(BASE_URL, json=test_Customer.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = response.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        # Check the data is correct
+        new_Customer = response.get_json()
+        self.assertEqual(new_Customer["name"], test_Customer.name)
+
+    # Todo: Uncomment this code when get_accounts is implemented
+    # # Check that the location header was correct
+    # response = self.client.get(location)
+    # self.assertEqual(response.status_code, status.HTTP_200_OK)
+    # new_Customer = response.get_json()
+    # self.assertEqual(new_Customer["name"], test_Customer.name)
