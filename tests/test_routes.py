@@ -32,6 +32,7 @@ DATABASE_URI = os.getenv(
 )
 BASE_URL = "/customers"
 
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -95,3 +96,27 @@ class TestYourResourceService(TestCase):
     # self.assertEqual(response.status_code, status.HTTP_200_OK)
     # new_Customer = response.get_json()
     # self.assertEqual(new_Customer["name"], test_Customer.name)
+
+    def _create_customers(self, count: int = 1) -> list:
+        """Factory method to create customers in bulk"""
+        customers = []
+        for _ in range(count):
+            test_customer = CustomerFactory()
+            response = self.client.post(BASE_URL, json=test_customer.serialize())
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test customer",
+            )
+            new_customer = response.get_json()
+            test_customer.id = new_customer["id"]
+            customers.append(test_customer)
+        return customers
+
+    def test_get_customer_list(self):
+        """It should Get a list of Customers"""
+        self._create_customers(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
