@@ -24,7 +24,7 @@ import logging
 from unittest import TestCase
 from wsgi import app
 from service.common import status
-from service.models import db, YourResourceModel
+from service.models import db, Customer
 from .factories import CustomerFactory
 
 DATABASE_URI = os.getenv(
