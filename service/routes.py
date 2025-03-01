@@ -148,3 +148,33 @@ def list_customers():
     results = [customer.serialize() for customer in customers]
     app.logger.info("Returning %d customers", len(results))
     return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
+# UPDATE AN EXISTING CUSTOMER
+######################################################################
+@app.route("/customers/<int:id>", methods=["PUT"])
+def update_customers(id):
+    """
+    Update a Customer
+
+    This endpoint will update a Customer based the body that is posted
+    """
+    app.logger.info("Request to Update a customer with id [%s]", id)
+    check_content_type("application/json")
+
+    # Attempt to find the Customer and abort if not found
+    customer = Customer.find(id)
+    if not customer:
+        abort(status.HTTP_404_NOT_FOUND, f"Customer with id '{id}' was not found.")
+
+    # Update the Customer with the new data
+    data = request.get_json()
+    app.logger.info("Processing: %s", data)
+    customer.deserialize(data)
+
+    # Save the updates to the database
+    customer.update()
+
+    app.logger.info("Customer with ID: %d updated.", customer.id)
+    return jsonify(customer.serialize()), status.HTTP_200_OK
