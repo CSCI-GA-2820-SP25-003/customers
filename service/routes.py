@@ -116,7 +116,7 @@ def list_customers():
     name = request.args.get("name")
     address = request.args.get("address")
     email = request.args.get("email")
-    phonenumber = request.args.get("email")
+    phonenumber = request.args.get("phonenumber")
 
     if id:
         app.logger.info("Find by id: %s", id)
@@ -135,7 +135,7 @@ def list_customers():
     elif phonenumber:
         app.logger.info("Find by phonenumber: %s", phonenumber)
         # create enum from string
-        customers = Customer.find_by_email(phonenumber)
+        customers = Customer.find_by_phonenumber(phonenumber)
     else:
         app.logger.info("Find all")
         customers = Customer.all()
