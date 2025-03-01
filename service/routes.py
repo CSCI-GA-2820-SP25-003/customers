@@ -43,6 +43,7 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
+
 # Todo: Place your REST API code here ...
 ######################################################################
 # CREATE A NEW customer
@@ -69,7 +70,12 @@ def create_customers():
     # Return the location of the new customer
     location_url = "unknown"
     # location_url = url_for("get_customers", customer_id=customer.id, _external=True)
-    return jsonify(customer.serialize()), status.HTTP_201_CREATED, {"Location": location_url}
+    return (
+        jsonify(customer.serialize()),
+        status.HTTP_201_CREATED,
+        {"Location": location_url},
+    )
+
 
 ######################################################################
 # Checks the ContentType of a request
@@ -85,9 +91,55 @@ def check_content_type(content_type) -> None:
 
     if request.headers["Content-Type"] == content_type:
         return
-    
+
     app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
+
+
+######################################################################
+# LIST ALL CUSTOMERS
+######################################################################
+
+
+@app.route("/customers", methods=["GET"])
+def list_customers():
+    """Returns all of the Customers"""
+    app.logger.info("Request for customer list")
+
+    customers = []
+
+    # Parse any arguments from the query string
+    id = request.args.get("id")
+    name = request.args.get("name")
+    address = request.args.get("address")
+    email = request.args.get("email")
+    phonenumber = request.args.get("email")
+
+    if id:
+        app.logger.info("Find by id: %s", id)
+        customers = Customer.find_by_id(id)
+    elif name:
+        app.logger.info("Find by name: %s", name)
+        customers = Customer.find_by_name(name)
+    elif address:
+        app.logger.info("Find by address: %s", address)
+        # create bool from string
+        customers = Customer.find_by_address(address)
+    elif email:
+        app.logger.info("Find by email: %s", email)
+        # create enum from string
+        customers = Customer.find_by_email(email)
+    elif phonenumber:
+        app.logger.info("Find by phonenumber: %s", phonenumber)
+        # create enum from string
+        customers = Customer.find_by_email(phonenumber)
+    else:
+        app.logger.info("Find all")
+        customers = Customer.all()
+
+    results = [customer.serialize() for customer in customers]
+    app.logger.info("Returning %d customers", len(results))
+    return jsonify(results), status.HTTP_200_OK
