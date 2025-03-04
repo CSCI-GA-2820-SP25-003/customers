@@ -91,3 +91,24 @@ class TestCustomer(TestCase):
         self.assertEqual(found_customer.address, customer.address)
         self.assertEqual(found_customer.email, customer.email)
         self.assertEqual(found_customer.phonenumber, customer.phonenumber)
+
+    def test_update_customer(self):
+        """It should Update a Customer"""
+        customer = CustomerFactory()
+        logging.debug(customer)
+        customer.id = None
+        customer.create()
+        logging.debug(customer)
+        self.assertIsNotNone(customer.id)
+        # Change it an save it
+        customer.name = "John Doe"
+        original_id = customer.id
+        customer.update()
+        self.assertEqual(customer.id, original_id)
+        self.assertEqual(customer.name, "John Doe")
+        # Fetch it back and make sure the id hasn't changed
+        # but the data did change
+        customers = customer.all()
+        self.assertEqual(len(customers), 1)
+        self.assertEqual(customers[0].id, original_id)
+        self.assertEqual(customers[0].name, "John Doe")
