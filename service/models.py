@@ -91,10 +91,30 @@ class Customer(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
+            if not isinstance(data["name"], str):
+                raise DataValidationError(
+                    "Invalid type for [name]: " + str(type(data["name"]))
+                )
             self.name = data["name"]
+
+            if not isinstance(data["address"], str):
+                raise DataValidationError(
+                    "Invalid type for [address]: " + str(type(data["address"]))
+                )
             self.address = data["address"]
+
+            if not isinstance(data["email"], str):
+                raise DataValidationError(
+                    "Invalid type for [email]: " + str(type(data["email"]))
+                )
             self.email = data["email"]
+
+            if not isinstance(data["phonenumber"], str):
+                raise DataValidationError(
+                    "Invalid type for [phonenumber]: " + str(type(data["phonenumber"]))
+                )
             self.phonenumber = data["phonenumber"]
+
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
@@ -133,3 +153,33 @@ class Customer(db.Model):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+    @classmethod
+    def find_by_address(cls, address):
+        """Returns all Customers with the given address
+
+        Args:
+            address (string): the address of the Customers you want to match
+        """
+        logger.info("Processing address query for %s ...", address)
+        return cls.query.filter(cls.address == address)
+
+    @classmethod
+    def find_by_email(cls, email):
+        """Returns all Customers with the given email
+
+        Args:
+            email (string): the email of the Customers you want to match
+        """
+        logger.info("Processing email query for %s ...", email)
+        return cls.query.filter(cls.email == email)
+
+    @classmethod
+    def find_by_phonenumber(cls, phonenumber):
+        """Returns all Customers with the given phonenumber
+
+        Args:
+            phonenumber (string): the phonenumber of the Customers you want to match
+        """
+        logger.info("Processing phonenumber query for %s ...", phonenumber)
+        return cls.query.filter(cls.phonenumber == phonenumber)
