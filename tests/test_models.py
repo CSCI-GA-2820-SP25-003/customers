@@ -15,7 +15,7 @@
 ######################################################################
 
 """
-Test cases for Pet Model
+Test cases for Customer Model
 """
 
 # pylint: disable=duplicate-code
@@ -77,3 +77,15 @@ class TestCustomer(TestCase):
         self.assertEqual(data.address, customer.address)
         self.assertEqual(data.email, customer.email)
         self.assertEqual(data.phonenumber, customer.phonenumber)
+
+    def test_list_all_customers(self):
+        """It should List all Customers in the database"""
+        customers = Customer.all()
+        self.assertEqual(customers, [])
+        # Create 5 Customers
+        for _ in range(5):
+            customer = CustomerFactory()
+            customer.create()
+        # See if we get back 5 customers
+        customers = Customer.all()
+        self.assertEqual(len(customers), 5)
