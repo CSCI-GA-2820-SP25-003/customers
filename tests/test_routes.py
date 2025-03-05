@@ -274,4 +274,3 @@ class TestSadPaths(TestCase):
     #     test_customer = customer.serialize()
     #     test_customer["gender"] = "XXX"  # invalid gender
     #     response = self.client.post(BASE_URL, json=test_customer)
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
