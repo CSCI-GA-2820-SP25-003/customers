@@ -26,6 +26,7 @@ from wsgi import app
 from service.common import status
 from service.models import db, Customer
 from .factories import CustomerFactory
+from urllib.parse import quote_plus
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -64,6 +65,25 @@ class TestYourResourceService(TestCase):
     def tearDown(self):
         """This runs after each test"""
         db.session.remove()
+
+    ############################################################
+    # Utility function to bulk create customer
+    ############################################################
+    def _create_customer(self, count: int = 1) -> list:
+        """Factory method to create customer in bulk"""
+        customer = []
+        for _ in range(count):
+            test_pet = CustomerFactory()
+            response = self.client.post(BASE_URL, json=test_pet.serialize())
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test customer",
+            )
+            new_pet = response.get_json()
+            test_pet.id = new_pet["id"]
+            customer.append(test_pet)
+        return customer
 
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
@@ -186,6 +206,27 @@ class TestYourResourceService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
 
+    # ----------------------------------------------------------
+    # TEST QUERY
+    # ----------------------------------------------------------
+    def test_query_by_name(self):
+        """It should Query Customers by name"""
+        customers = self._create_customers(5)
+        test_name = customers[0].name
+        name_count = len(
+            [customer for customer in customers if customer.name == test_name]
+        )
+        response = self.client.get(
+            BASE_URL, query_string=f"name={quote_plus(test_name)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), name_count)
+        # check the data just to be sure
+        for customer in data:
+            self.assertEqual(customer["name"], test_name)
+
+
 ######################################################################
 #  T E S T   S A D   P A T H S
 ######################################################################
@@ -233,4 +274,3 @@ class TestSadPaths(TestCase):
     #     test_customer = customer.serialize()
     #     test_customer["gender"] = "XXX"  # invalid gender
     #     response = self.client.post(BASE_URL, json=test_customer)
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
