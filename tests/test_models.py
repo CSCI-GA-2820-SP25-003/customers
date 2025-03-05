@@ -185,3 +185,77 @@ class TestCustomer(TestCase):
         self.assertEqual(len(customers), 1)
         self.assertEqual(customers[0].id, original_id)
         self.assertEqual(customers[0].name, "John Doe")
+
+
+######################################################################
+#  Q U E R Y   T E S T   C A S E S
+######################################################################
+class TestModelQueries(TestCustomer):
+    """Customer Model Query Tests"""
+
+    def test_find_customer(self):
+        """It should Find a Customer by ID"""
+        customers = CustomerFactory.create_batch(5)
+        for customer in customers:
+            customer.create()
+        logging.debug(customers)
+        # make sure they got saved
+        self.assertEqual(len(Customer.all()), 5)
+        # find the 2nd customer in the list
+        customer = Customer.find(customers[1].id)
+        self.assertIsNot(customer, None)
+        self.assertEqual(customer.id, customers[1].id)
+        self.assertEqual(customer.name, customers[1].name)
+        self.assertEqual(customer.address, customers[1].address)
+        self.assertEqual(customer.email, customers[1].email)
+        self.assertEqual(customer.phonenumber, customers[1].phonenumber)
+
+    def test_find_by_name(self):
+        """It should Find a Customer by Name"""
+        customers = CustomerFactory.create_batch(10)
+        for customer in customers:
+            customer.create()
+        name = customers[0].name
+        count = len([customer for customer in customers if customer.name == name])
+        found = Customer.find_by_name(name)
+        self.assertEqual(found.count(), count)
+        for customer in found:
+            self.assertEqual(customer.name, name)
+
+    def test_find_by_address(self):
+        """It should Find a Customer by address"""
+        customers = CustomerFactory.create_batch(10)
+        for customer in customers:
+            customer.create()
+        address = customers[0].address
+        count = len([customer for customer in customers if customer.address == address])
+        found = Customer.find_by_address(address)
+        self.assertEqual(found.count(), count)
+        for customer in found:
+            self.assertEqual(customer.address, address)
+
+    def test_find_by_email(self):
+        """It should Find a Customer by email"""
+        customers = CustomerFactory.create_batch(10)
+        for customer in customers:
+            customer.create()
+        email = customers[0].email
+        count = len([customer for customer in customers if customer.email == email])
+        found = Customer.find_by_email(email)
+        self.assertEqual(found.count(), count)
+        for customer in found:
+            self.assertEqual(customer.email, email)
+
+    def test_find_by_phonenumber(self):
+        """It should Find a Customer by Phonenumber"""
+        customers = CustomerFactory.create_batch(10)
+        for customer in customers:
+            customer.create()
+        phonenumber = customers[0].phonenumber
+        count = len(
+            [customer for customer in customers if customer.phonenumber == phonenumber]
+        )
+        found = Customer.find_by_phonenumber(phonenumber)
+        self.assertEqual(found.count(), count)
+        for customer in found:
+            self.assertEqual(customer.phonenumber, phonenumber)
