@@ -78,6 +78,18 @@ class TestCustomer(TestCase):
         self.assertEqual(data.email, customer.email)
         self.assertEqual(data.phonenumber, customer.phonenumber)
 
+    def test_list_all_customers(self):
+        """It should List all Customers in the database"""
+        customers = Customer.all()
+        self.assertEqual(customers, [])
+        # Create 5 Customers
+        for _ in range(5):
+            customer = CustomerFactory()
+            customer.create()
+        # See if we get back 5 customers
+        customers = Customer.all()
+        self.assertEqual(len(customers), 5)
+
     def test_read_a_customer(self):
         """It should Read a Customer"""
         customer = CustomerFactory()
@@ -152,3 +164,24 @@ class TestCustomer(TestCase):
         data["name"] = 45
         customer = Customer()
         self.assertRaises(DataValidationError, customer.deserialize, data)
+
+    def test_update_customer(self):
+        """It should Update a Customer"""
+        customer = CustomerFactory()
+        logging.debug(customer)
+        customer.id = None
+        customer.create()
+        logging.debug(customer)
+        self.assertIsNotNone(customer.id)
+        # Change it an save it
+        customer.name = "John Doe"
+        original_id = customer.id
+        customer.update()
+        self.assertEqual(customer.id, original_id)
+        self.assertEqual(customer.name, "John Doe")
+        # Fetch it back and make sure the id hasn't changed
+        # but the data did change
+        customers = customer.all()
+        self.assertEqual(len(customers), 1)
+        self.assertEqual(customers[0].id, original_id)
+        self.assertEqual(customers[0].name, "John Doe")
