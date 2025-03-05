@@ -97,9 +97,9 @@ class TestYourResourceService(TestCase):
     # Todo: Add your test cases here...
     def test_create_customer(self):
         """It should Create a new Customer"""
-        test_Customer = CustomerFactory()
-        logging.debug("Test Customer: %s", test_Customer.serialize())
-        response = self.client.post(BASE_URL, json=test_Customer.serialize())
+        test_customer = CustomerFactory()
+        logging.debug("Test Customer: %s", test_customer.serialize())
+        response = self.client.post(BASE_URL, json=test_customer.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Make sure location header is set
@@ -107,14 +107,20 @@ class TestYourResourceService(TestCase):
         self.assertIsNotNone(location)
 
         # Check the data is correct
-        new_Customer = response.get_json()
-        self.assertEqual(new_Customer["name"], test_Customer.name)
+        new_customer = response.get_json()
+        self.assertEqual(new_customer["name"], test_customer.name)
+        self.assertEqual(new_customer["address"], test_customer.address)
+        self.assertEqual(new_customer["email"], test_customer.email)
+        self.assertEqual(new_customer["phonenumber"], test_customer.phonenumber)
 
         # # Check that the location header was correct
         response = self.client.get(location)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        new_Customer = response.get_json()
-        self.assertEqual(new_Customer["name"], test_Customer.name)
+        new_customer = response.get_json()
+        self.assertEqual(new_customer["name"], test_customer.name)
+        self.assertEqual(new_customer["address"], test_customer.address)
+        self.assertEqual(new_customer["email"], test_customer.email)
+        self.assertEqual(new_customer["phonenumber"], test_customer.phonenumber)
 
     def _create_customers(self, count: int = 1) -> list:
         """Factory method to create customers in bulk"""
