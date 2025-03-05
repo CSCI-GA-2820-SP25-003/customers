@@ -77,9 +77,9 @@ class TestYourResourceService(TestCase):
     # Todo: Add your test cases here...
     def test_create_customer(self):
         """It should Create a new Customer"""
-        test_Customer = CustomerFactory()
-        logging.debug("Test Customer: %s", test_Customer.serialize())
-        response = self.client.post(BASE_URL, json=test_Customer.serialize())
+        test_customer = CustomerFactory()
+        logging.debug("Test Customer: %s", test_customer.serialize())
+        response = self.client.post(BASE_URL, json=test_customer.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Make sure location header is set
@@ -87,14 +87,20 @@ class TestYourResourceService(TestCase):
         self.assertIsNotNone(location)
 
         # Check the data is correct
-        new_Customer = response.get_json()
-        self.assertEqual(new_Customer["name"], test_Customer.name)
+        new_customer = response.get_json()
+        self.assertEqual(new_customer["name"], test_customer.name)
+        self.assertEqual(new_customer["address"], test_customer.address)
+        self.assertEqual(new_customer["email"], test_customer.email)
+        self.assertEqual(new_customer["phonenumber"], test_customer.phonenumber)
 
         # # Check that the location header was correct
         response = self.client.get(location)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        new_Customer = response.get_json()
-        self.assertEqual(new_Customer["name"], test_Customer.name)
+        new_customer = response.get_json()
+        self.assertEqual(new_customer["name"], test_customer.name)
+        self.assertEqual(new_customer["address"], test_customer.address)
+        self.assertEqual(new_customer["email"], test_customer.email)
+        self.assertEqual(new_customer["phonenumber"], test_customer.phonenumber)
 
     def _create_customers(self, count: int = 1) -> list:
         """Factory method to create customers in bulk"""
@@ -179,3 +185,52 @@ class TestYourResourceService(TestCase):
         response = self.client.delete(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
+
+######################################################################
+#  T E S T   S A D   P A T H S
+######################################################################
+class TestSadPaths(TestCase):
+    """Test REST Exception Handling"""
+
+    def setUp(self):
+        """Runs before each test"""
+        self.client = app.test_client()
+
+    def test_method_not_allowed(self):
+        """It should not allow update without a customer id"""
+        response = self.client.put(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_create_customer_no_data(self):
+        """It should not Create a Customer with missing data"""
+        response = self.client.post(BASE_URL, json={})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_customer_no_content_type(self):
+        """It should not Create a Customer with no content type"""
+        response = self.client.post(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_create_customer_wrong_content_type(self):
+        """It should not Create a Customer with the wrong content type"""
+        response = self.client.post(BASE_URL, data="hello", content_type="text/html")
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    # def test_create_customer_bad_available(self):
+    #     """It should not Create a Customer with bad available data"""
+    #     test_customer = CustomerFactory()
+    #     logging.debug(test_customer)
+    #     # change available to a string
+    #     test_customer.available = "true"
+    #     response = self.client.post(BASE_URL, json=test_customer.serialize())
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # def test_create_customer_bad_email(self):
+    #     """It should not Create a Customer with bad email data"""
+    #     customer = CustomerFactory()
+    #     logging.debug(customer)
+    #     # change gender to a bad string
+    #     test_customer = customer.serialize()
+    #     test_customer["gender"] = "XXX"  # invalid gender
+    #     response = self.client.post(BASE_URL, json=test_customer)
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
