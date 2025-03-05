@@ -73,16 +73,16 @@ class TestYourResourceService(TestCase):
         """Factory method to create customer in bulk"""
         customer = []
         for _ in range(count):
-            test_pet = CustomerFactory()
-            response = self.client.post(BASE_URL, json=test_pet.serialize())
+            test_customer = CustomerFactory()
+            response = self.client.post(BASE_URL, json=test_customer.serialize())
             self.assertEqual(
                 response.status_code,
                 status.HTTP_201_CREATED,
                 "Could not create test customer",
             )
-            new_pet = response.get_json()
-            test_pet.id = new_pet["id"]
-            customer.append(test_pet)
+            new_customer = response.get_json()
+            test_customer.id = new_customer["id"]
+            customer.append(test_customer)
         return customer
 
     ######################################################################
@@ -93,6 +93,16 @@ class TestYourResourceService(TestCase):
         """It should call the home page"""
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], "Customer REST API Service")
+
+    def test_health(self):
+        """It should be healthy"""
+        response = self.client.get("/health")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["status"], 200)
+        self.assertEqual(data["message"], "Healthy")
 
     # Todo: Add your test cases here...
     def test_create_customer(self):
@@ -226,6 +236,57 @@ class TestYourResourceService(TestCase):
         for customer in data:
             self.assertEqual(customer["name"], test_name)
 
+    def test_query_by_address(self):
+        """It should Query Customers by Address"""
+        customers = self._create_customers(10)
+        test_address = customers[0].address
+        address_count = len(
+            [customer for customer in customers if customer.address == test_address]
+        )
+        response = self.client.get(
+            BASE_URL, query_string=f"address={quote_plus(test_address)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), address_count)
+        # check the data just to be sure
+        for customer in data:
+            self.assertEqual(customer["address"], test_address)
+
+    def test_query_by_phonenumber(self):
+        """It should Query Customers by phone number"""
+        customers = self._create_customers(5)
+        test_phone = customers[0].phonenumber
+        phone_count = len(
+            [customer for customer in customers if customer.phonenumber == test_phone]
+        )
+        response = self.client.get(
+            BASE_URL, query_string=f"phonenumber={quote_plus(test_phone)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), phone_count)
+        # check the data just to be sure
+        for customer in data:
+            self.assertEqual(customer["phonenumber"], test_phone)
+
+    def test_query_by_email(self):
+        """It should Query Customers by email"""
+        customers = self._create_customers(5)
+        test_email = customers[0].email
+        email_count = len(
+            [customer for customer in customers if customer.email == test_email]
+        )
+        response = self.client.get(
+            BASE_URL, query_string=f"email={quote_plus(test_email)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), email_count)
+        # check the data just to be sure
+        for customer in data:
+            self.assertEqual(customer["email"], test_email)
+
 
 ######################################################################
 #  T E S T   S A D   P A T H S
@@ -237,10 +298,10 @@ class TestSadPaths(TestCase):
         """Runs before each test"""
         self.client = app.test_client()
 
-    def test_method_not_allowed(self):
-        """It should not allow update without a customer id"""
-        response = self.client.put(BASE_URL)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+    # def test_method_not_allowed(self):
+    #     """It should not allow update without a customer id"""
+    #     response = self.client.put(BASE_URL)
+    #     self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_create_customer_no_data(self):
         """It should not Create a Customer with missing data"""

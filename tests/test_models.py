@@ -186,6 +186,13 @@ class TestCustomer(TestCase):
         self.assertEqual(customers[0].id, original_id)
         self.assertEqual(customers[0].name, "John Doe")
 
+    # def test_update_no_id(self):
+    #     """It should not Update a Customer with no id"""
+    #     customer = CustomerFactory()
+    #     logging.debug(customer)
+    #     customer.id = None
+    #     self.assertRaises(DataValidationError, customer.update)
+
 
 ######################################################################
 #  Q U E R Y   T E S T   C A S E S
