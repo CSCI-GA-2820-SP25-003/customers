@@ -55,6 +55,8 @@ class Customer(db.Model):
         Updates a Customer to the database
         """
         logger.info("Saving %s", self.name)
+        if self.id is None:
+            raise DataValidationError("Cannot update a customer with no ID")
         try:
             db.session.commit()
         except Exception as e:
