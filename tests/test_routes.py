@@ -298,10 +298,10 @@ class TestSadPaths(TestCase):
         """Runs before each test"""
         self.client = app.test_client()
 
-    # def test_method_not_allowed(self):
-    #     """It should not allow update without a customer id"""
-    #     response = self.client.put(BASE_URL)
-    #     self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+    def test_method_not_allowed(self):
+        """It should not allow update without a customer id"""
+        response = self.client.put(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_create_customer_no_data(self):
         """It should not Create a Customer with missing data"""
@@ -317,21 +317,3 @@ class TestSadPaths(TestCase):
         """It should not Create a Customer with the wrong content type"""
         response = self.client.post(BASE_URL, data="hello", content_type="text/html")
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-    # def test_create_customer_bad_available(self):
-    #     """It should not Create a Customer with bad available data"""
-    #     test_customer = CustomerFactory()
-    #     logging.debug(test_customer)
-    #     # change available to a string
-    #     test_customer.available = "true"
-    #     response = self.client.post(BASE_URL, json=test_customer.serialize())
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    # def test_create_customer_bad_email(self):
-    #     """It should not Create a Customer with bad email data"""
-    #     customer = CustomerFactory()
-    #     logging.debug(customer)
-    #     # change gender to a bad string
-    #     test_customer = customer.serialize()
-    #     test_customer["gender"] = "XXX"  # invalid gender
-    #     response = self.client.post(BASE_URL, json=test_customer)

@@ -22,6 +22,7 @@ Test cases for Customer Model
 import os
 import logging
 from unittest import TestCase
+from unittest.mock import patch
 from wsgi import app
 from service.models import Customer, DataValidationError, db
 from .factories import CustomerFactory
@@ -186,12 +187,40 @@ class TestCustomer(TestCase):
         self.assertEqual(customers[0].id, original_id)
         self.assertEqual(customers[0].name, "John Doe")
 
-    # def test_update_no_id(self):
-    #     """It should not Update a Customer with no id"""
-    #     customer = CustomerFactory()
-    #     logging.debug(customer)
-    #     customer.id = None
-    #     self.assertRaises(DataValidationError, customer.update)
+    def test_update_no_id(self):
+        """It should not Update a Customer with no id"""
+        customer = CustomerFactory()
+        logging.debug(customer)
+        customer.id = None
+        self.assertRaises(DataValidationError, customer.update)
+
+
+######################################################################
+#  T E S T   E X C E P T I O N   H A N D L E R S
+######################################################################
+class TestExceptionHandlers(TestCustomer):
+    """Customer Model Exception Handlers"""
+
+    @patch("service.models.db.session.commit")
+    def test_create_exception(self, exception_mock):
+        """It should catch a create exception"""
+        exception_mock.side_effect = Exception()
+        customer = CustomerFactory()
+        self.assertRaises(DataValidationError, customer.create)
+
+    @patch("service.models.db.session.commit")
+    def test_update_exception(self, exception_mock):
+        """It should catch a update exception"""
+        exception_mock.side_effect = Exception()
+        customer = CustomerFactory()
+        self.assertRaises(DataValidationError, customer.update)
+
+    @patch("service.models.db.session.commit")
+    def test_delete_exception(self, exception_mock):
+        """It should catch a delete exception"""
+        exception_mock.side_effect = Exception()
+        customer = CustomerFactory()
+        self.assertRaises(DataValidationError, customer.delete)
 
 
 ######################################################################
