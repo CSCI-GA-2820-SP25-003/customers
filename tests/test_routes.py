@@ -69,9 +69,9 @@ class TestYourResourceService(TestCase):
     ############################################################
     # Utility function to bulk create customer
     ############################################################
-    def _create_customer(self, count: int = 1) -> list:
+    def _create_customers(self, count: int = 1) -> list:
         """Factory method to create customer in bulk"""
-        customer = []
+        customers = []
         for _ in range(count):
             test_customer = CustomerFactory()
             response = self.client.post(BASE_URL, json=test_customer.serialize())
@@ -82,13 +82,13 @@ class TestYourResourceService(TestCase):
             )
             new_customer = response.get_json()
             test_customer.id = new_customer["id"]
-            customer.append(test_customer)
-        return customer
+            
+            customers.append(test_customer)
+        return customers
 
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
-
     def test_index(self):
         """It should call the home page"""
         resp = self.client.get("/")
@@ -131,22 +131,6 @@ class TestYourResourceService(TestCase):
         self.assertEqual(new_customer["address"], test_customer.address)
         self.assertEqual(new_customer["email"], test_customer.email)
         self.assertEqual(new_customer["phonenumber"], test_customer.phonenumber)
-
-    def _create_customers(self, count: int = 1) -> list:
-        """Factory method to create customers in bulk"""
-        customers = []
-        for _ in range(count):
-            test_customer = CustomerFactory()
-            response = self.client.post(BASE_URL, json=test_customer.serialize())
-            self.assertEqual(
-                response.status_code,
-                status.HTTP_201_CREATED,
-                "Could not create test customer",
-            )
-            new_customer = response.get_json()
-            test_customer.id = new_customer["id"]
-            customers.append(test_customer)
-        return customers
 
     def test_get_customer_list(self):
         """It should Get a list of Customers"""
