@@ -33,8 +33,13 @@ from service.common import status  # HTTP Status Codes
 @app.route("/")
 def index():
     """Root URL response"""
+    app.logger.info("Request for Root URL")
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Customer REST API Service",
+            version="1.0",
+            paths=url_for("customers", _external=True),
+        ),
         status.HTTP_200_OK,
     )
 
@@ -44,7 +49,6 @@ def index():
 ######################################################################
 
 
-# Todo: Place your REST API code here ...
 ######################################################################
 # CREATE A NEW customer
 ######################################################################
@@ -67,9 +71,7 @@ def create_customers():
     customer.create()
     app.logger.info("customer with new id [%s] saved!", customer.id)
 
-    # Return the location of the new customer
-    location_url = "unknown"
-    # location_url = url_for("get_customers", customer_id=customer.id, _external=True)
+    location_url = url_for("get_customers", customer_id=customer.id, _external=True)
     return (
         jsonify(customer.serialize()),
         status.HTTP_201_CREATED,
@@ -143,3 +145,57 @@ def list_customers():
     results = [customer.serialize() for customer in customers]
     app.logger.info("Returning %d customers", len(results))
     return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
+# UPDATE AN EXISTING CUSTOMER
+######################################################################
+@app.route("/customers/<int:id>", methods=["PUT"])
+def update_customers(id):
+    """
+    Update a Customer
+
+    This endpoint will update a Customer based the body that is posted
+    """
+    app.logger.info("Request to Update a customer with id [%s]", id)
+    check_content_type("application/json")
+
+    # Attempt to find the Customer and abort if not found
+    customer = Customer.find(id)
+    if not customer:
+        abort(status.HTTP_404_NOT_FOUND, f"Customer with id '{id}' was not found.")
+
+    # Update the Customer with the new data
+    data = request.get_json()
+    app.logger.info("Processing: %s", data)
+    customer.deserialize(data)
+
+    # Save the updates to the database
+    customer.update()
+
+    app.logger.info("Customer with ID: %d updated.", customer.id)
+    return jsonify(customer.serialize()), status.HTTP_200_OK
+
+
+######################################################################
+# READ A Customer
+######################################################################
+@app.route("/customers/<int:customer_id>", methods=["GET"])
+def get_customers(customer_id):
+    """
+    Retrieve a single Customer
+
+    This endpoint will return a Customer based on it's id
+    """
+    app.logger.info("Request to Retrieve a customer with id [%s]", customer_id)
+
+    # Attempt to find the Customer and abort if not found
+    customer = Customer.find(customer_id)
+    if not customer:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Customer with id '{customer_id}' was not found.",
+        )
+
+    app.logger.info("Returning customer: %s", customer.name)
+    return jsonify(customer.serialize()), status.HTTP_200_OK

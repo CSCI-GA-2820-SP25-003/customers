@@ -75,7 +75,7 @@ class TestYourResourceService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     # Todo: Add your test cases here...
-    def test_create_Customer(self):
+    def test_create_customer(self):
         """It should Create a new Customer"""
         test_Customer = CustomerFactory()
         logging.debug("Test Customer: %s", test_Customer.serialize())
@@ -90,12 +90,11 @@ class TestYourResourceService(TestCase):
         new_Customer = response.get_json()
         self.assertEqual(new_Customer["name"], test_Customer.name)
 
-    # Todo: Uncomment this code when get_accounts is implemented
-    # # Check that the location header was correct
-    # response = self.client.get(location)
-    # self.assertEqual(response.status_code, status.HTTP_200_OK)
-    # new_Customer = response.get_json()
-    # self.assertEqual(new_Customer["name"], test_Customer.name)
+        # # Check that the location header was correct
+        response = self.client.get(location)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        new_Customer = response.get_json()
+        self.assertEqual(new_Customer["name"], test_Customer.name)
 
     def _create_customers(self, count: int = 1) -> list:
         """Factory method to create customers in bulk"""
@@ -120,3 +119,44 @@ class TestYourResourceService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 5)
+
+    # ----------------------------------------------------------
+    # TEST UPDATE
+    # ----------------------------------------------------------
+    def test_update_customer(self):
+        """It should Update an existing Customer"""
+        # create a customer to update
+        test_customer = CustomerFactory()
+        response = self.client.post(BASE_URL, json=test_customer.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # update the customer
+        new_customer = response.get_json()
+        logging.debug(new_customer)
+        new_customer["name"] = "unknown"
+        response = self.client.put(
+            f"{BASE_URL}/{new_customer['id']}", json=new_customer
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_customer = response.get_json()
+        self.assertEqual(updated_customer["name"], "unknown")
+
+    # ----------------------------------------------------------
+    # TEST READ
+    # ----------------------------------------------------------
+    def test_get_customer(self):
+        """It should Get a single Customer"""
+        # get the id of a customer
+        test_customer = self._create_customers(1)[0]
+        response = self.client.get(f"{BASE_URL}/{test_customer.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["name"], test_customer.name)
+
+    def test_get_customer_not_found(self):
+        """It should not Get a Customer thats not found"""
+        response = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        logging.debug("Response data = %s", data)
+        self.assertIn("was not found", data["message"])

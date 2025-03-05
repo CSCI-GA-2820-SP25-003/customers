@@ -89,3 +89,17 @@ class TestCustomer(TestCase):
         # See if we get back 5 customers
         customers = Customer.all()
         self.assertEqual(len(customers), 5)
+
+    def test_read_a_customer(self):
+        """It should Read a Customer"""
+        customer = CustomerFactory()
+        logging.debug(customer)
+        customer.id = None
+        customer.create()
+        self.assertIsNotNone(customer.id)
+        # Fetch it back
+        found_customer = Customer.find(customer.id)
+        self.assertEqual(found_customer.name, customer.name)
+        self.assertEqual(found_customer.address, customer.address)
+        self.assertEqual(found_customer.email, customer.email)
+        self.assertEqual(found_customer.phonenumber, customer.phonenumber)
