@@ -104,6 +104,67 @@ class TestCustomer(TestCase):
         self.assertEqual(found_customer.email, customer.email)
         self.assertEqual(found_customer.phonenumber, customer.phonenumber)
 
+    def test_delete_a_customer(self):
+        """It should Delete a Customer"""
+        customer = CustomerFactory()
+        customer.create()
+        self.assertEqual(len(Customer.all()), 1)
+        # delete the customer and make sure it isn't in the database
+        customer.delete()
+        self.assertEqual(len(Customer.all()), 0)
+
+    def test_serialize_a_customer(self):
+        """It should serialize a Customer"""
+        customer = CustomerFactory()
+        data = customer.serialize()
+        self.assertNotEqual(data, None)
+        self.assertIn("id", data)
+        self.assertEqual(data["id"], customer.id)
+        self.assertIn("name", data)
+        self.assertEqual(data["name"], customer.name)
+        self.assertIn("email", data)
+        self.assertEqual(data["email"], customer.email)
+        self.assertIn("address", data)
+        self.assertEqual(data["address"], customer.address)
+        self.assertIn("phonenumber", data)
+        self.assertEqual(data["phonenumber"], customer.phonenumber)
+
+    def test_deserialize_a_customer(self):
+        """It should de-serialize a customer"""
+        data = CustomerFactory().serialize()
+        customer = Customer()
+        customer.deserialize(data)
+        self.assertNotEqual(customer, None)
+        self.assertEqual(customer.id, None)
+        self.assertEqual(customer.name, data["name"])
+        self.assertEqual(customer.address, data["address"])
+        self.assertEqual(customer.email, data["email"])
+        self.assertEqual(customer.phonenumber, data["phonenumber"])
+
+    def test_deserialize_missing_data(self):
+        """It should not deserialize a Customer with missing data"""
+        data = {
+            "id": 1,
+            "name": "Billy the Kid",
+            "email": "BillytheKid@gmail.com",
+        }  # phonenumber and address are missing
+        customer = Customer()
+        self.assertRaises(DataValidationError, customer.deserialize, data)
+
+    def test_deserialize_bad_data(self):
+        """It should not deserialize bad data"""
+        data = "this is not a dictionary"
+        customer = Customer()
+        self.assertRaises(DataValidationError, customer.deserialize, data)
+
+    def test_deserialize_bad_name(self):
+        """It should not deserialize a bad name attribute"""
+        test_customer = CustomerFactory()
+        data = test_customer.serialize()
+        data["name"] = 45
+        customer = Customer()
+        self.assertRaises(DataValidationError, customer.deserialize, data)
+
     def test_update_customer(self):
         """It should Update a Customer"""
         customer = CustomerFactory()
