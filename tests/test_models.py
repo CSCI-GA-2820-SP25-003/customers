@@ -295,3 +295,25 @@ class TestModelQueries(TestCustomer):
         self.assertEqual(found.count(), count)
         for customer in found:
             self.assertEqual(customer.phonenumber, phonenumber)
+
+    def test_find_by_name_and_email(self):
+        """It should Find a Customer by Name and Email"""
+        customers = CustomerFactory.create_batch(10)
+        for customer in customers:
+            customer.create()
+        name = customers[0].name
+        email = customers[0].email
+        found = Customer.find_by_name_and_email(name, email)
+        self.assertEqual(found.count(), 1)
+        self.assertEqual(found.first().name, name)
+        self.assertEqual(found.first().email, email)
+
+    def test_find_sorted_by_name(self):
+        """It should Return Customers Sorted by Name"""
+        customers = CustomerFactory.create_batch(10)
+        for customer in customers:
+            customer.create()
+        found = Customer.find_all_sorted_by_name()
+        sorted_names = sorted([customer.name for customer in customers])
+        retrieved_names = [customer.name for customer in found]
+        self.assertEqual(sorted_names, retrieved_names)

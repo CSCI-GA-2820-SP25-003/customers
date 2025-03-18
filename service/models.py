@@ -185,3 +185,17 @@ class Customer(db.Model):
         """
         logger.info("Processing phonenumber query for %s ...", phonenumber)
         return cls.query.filter(cls.phonenumber == phonenumber)
+
+    @classmethod
+    def find_by_name_and_email(cls, name, email):
+        """Finds a customer by both name and email"""
+        logger.info("Processing name & email query for %s, %s ...", name, email)
+        return cls.query.filter(cls.name == name, cls.email == email)
+
+    @classmethod
+    def find_all_sorted_by_name(cls, order="asc"):
+        """Returns all Customers sorted by name (default: ascending)"""
+        logger.info("Processing sorted query for customers by name")
+        if order == "desc":
+            return cls.query.order_by(cls.name.desc())
+        return cls.query.order_by(cls.name.asc())
