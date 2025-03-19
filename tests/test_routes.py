@@ -104,7 +104,6 @@ class TestYourResourceService(TestCase):
         self.assertEqual(data["status"], 200)
         self.assertEqual(data["message"], "Healthy")
 
-    # Todo: Add your test cases here...
     def test_create_customer(self):
         """It should Create a new Customer"""
         test_customer = CustomerFactory()

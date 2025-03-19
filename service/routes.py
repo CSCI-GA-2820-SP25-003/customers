@@ -123,15 +123,15 @@ def list_customers():
     customers = []
 
     # Parse any arguments from the query string
-    id = request.args.get("id")
+    customer_id = request.args.get("id")
     name = request.args.get("name")
     address = request.args.get("address")
     email = request.args.get("email")
     phonenumber = request.args.get("phonenumber")
 
-    if id:
-        app.logger.info("Find by id: %s", id)
-        customers = Customer.find_by_id(id)
+    if customer_id:
+        app.logger.info("Find by id: %s", customer_id)
+        customers = Customer.find(customer_id)
     elif name:
         app.logger.info("Find by name: %s", name)
         customers = Customer.find_by_name(name)
@@ -159,20 +159,23 @@ def list_customers():
 ######################################################################
 # UPDATE AN EXISTING CUSTOMER
 ######################################################################
-@app.route("/customers/<int:id>", methods=["PUT"])
-def update_customers(id):
+@app.route("/customers/<int:customer_id>", methods=["PUT"])
+def update_customers(customer_id):
     """
     Update a Customer
 
     This endpoint will update a Customer based the body that is posted
     """
-    app.logger.info("Request to Update a customer with id [%s]", id)
+    app.logger.info("Request to Update a customer with id [%s]", customer_id)
     check_content_type("application/json")
 
     # Attempt to find the Customer and abort if not found
-    customer = Customer.find(id)
+    customer = Customer.find(customer_id)
     if not customer:
-        abort(status.HTTP_404_NOT_FOUND, f"Customer with id '{id}' was not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Customer with id '{customer_id}' was not found.",
+        )
 
     # Update the Customer with the new data
     data = request.get_json()
