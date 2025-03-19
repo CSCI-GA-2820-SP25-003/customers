@@ -31,8 +31,6 @@ class Customer(db.Model):
     email = db.Column(db.String(50))
     phonenumber = db.Column(db.String(25))
 
-    # Todo: Place the rest of your schema here...
-
     def __repr__(self):
         return f"<Customer {self.name} id=[{self.id}]>"
 
