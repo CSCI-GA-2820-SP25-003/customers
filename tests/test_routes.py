@@ -22,11 +22,12 @@ TestCustomer API Service Test Suite
 import os
 import logging
 from unittest import TestCase
+from urllib.parse import quote_plus
+
 from wsgi import app
 from service.common import status
 from service.models import db, Customer
 from .factories import CustomerFactory
-from urllib.parse import quote_plus
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -82,7 +83,6 @@ class TestYourResourceService(TestCase):
             )
             new_customer = response.get_json()
             test_customer.id = new_customer["id"]
-            
             customers.append(test_customer)
         return customers
 
