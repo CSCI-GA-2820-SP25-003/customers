@@ -1,5 +1,7 @@
 # Customer REST API Service
 
+[![Build Status](https://github.com/CSCI-GA-2820-SP25-003/customers/actions/workflows/workflow.yml/badge.svg)](https://github.com/CSCI-GA-2820-SP25-003/customers/actions)
+
 A Flask-based REST API that allows you to create, read, update, and delete customer records. This service uses SQLAlchemy as the ORM to interact with the database.
 
 ## Overview
