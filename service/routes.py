@@ -269,7 +269,6 @@ def action_customer(customer_id):
         result = customer.serialize()
         result["action"] = "suspended"
         return jsonify(result), status.HTTP_200_OK
-    else:
-        abort(
-            status.HTTP_400_BAD_REQUEST,
-            f"Action '{action}' is not supported.")
+    abort(
+        status.HTTP_400_BAD_REQUEST,
+        f"Action '{action}' is not supported.")
