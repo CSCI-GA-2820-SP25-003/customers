@@ -233,3 +233,49 @@ def delete_customers(customer_id):
 
     app.logger.info("Customer with ID: %d delete complete.", customer_id)
     return {}, status.HTTP_204_NO_CONTENT
+
+######################################################################
+# ACTION ENDPOINT: PERFORM AN ACTION ON A CUSTOMER
+######################################################################
+@app.route("/customers/<int:customer_id>/action", methods=["POST"])
+def action_customer(customer_id):
+    """
+    Perform an action on a customer record.
+    Supported actions: suspend
+
+    Example Request JSON:
+    {
+      "action": "suspend"
+    }
+    """
+    app.logger.info("Request to perform an action on customer with id [%s]", customer_id)
+    # Ensure the request has the correct content type
+    check_content_type("application/json")
+    
+    # Lookup the customer
+    customer = Customer.find(customer_id)
+    if not customer:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Customer with id '{customer_id}' was not found."
+        )
+    
+    # Get the action from the JSON body
+    data = request.get_json()
+    action = data.get("action", "").lower() if data else ""
+    
+    # Process the supported action(s)
+    if action == "suspend":
+        app.logger.info("Suspending customer with id [%s]", customer_id)
+        # Here you would update a status flag in the database
+        # e.g., customer.status = "suspended" followed by customer.update()
+        # For now we simulate the action by returning the customer data with an action key.
+        result = customer.serialize()
+        result["action"] = "suspended"
+        return jsonify(result), status.HTTP_200_OK
+    else:
+        abort(
+            status.HTTP_400_BAD_REQUEST,
+            f"Action '{action}' is not supported."
+        )
+
