@@ -237,6 +237,8 @@ def delete_customers(customer_id):
 ######################################################################
 # ACTION ENDPOINT: PERFORM AN ACTION ON A CUSTOMER
 ######################################################################
+
+
 @app.route("/customers/<int:customer_id>/action", methods=["POST"])
 def action_customer(customer_id):
     """
@@ -271,3 +273,4 @@ def action_customer(customer_id):
             status.HTTP_400_BAD_REQUEST,
             f"Action '{action}' is not supported."
         )
+        
