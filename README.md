@@ -1,5 +1,7 @@
 
 [![codecov](https://codecov.io/gh/CSCI-GA-2820-SP25-003/customers/graph/badge.svg?token=92SBP8I9EC)](https://codecov.io/gh/CSCI-GA-2820-SP25-003/customers)
+![Build Status](https://github.com/CSCI-GA-2820-SP25-003/customers/actions/workflows/workflow.yml/badge.svg)
+
 
 # Customer REST API Service
 
