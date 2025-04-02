@@ -234,6 +234,7 @@ def delete_customers(customer_id):
     app.logger.info("Customer with ID: %d delete complete.", customer_id)
     return {}, status.HTTP_204_NO_CONTENT
 
+
 ######################################################################
 # ACTION ENDPOINT: PERFORM AN ACTION ON A CUSTOMER
 ######################################################################
@@ -271,6 +272,4 @@ def action_customer(customer_id):
     else:
         abort(
             status.HTTP_400_BAD_REQUEST,
-            f"Action '{action}' is not supported."
-        )
-        
+            f"Action '{action}' is not supported.")
