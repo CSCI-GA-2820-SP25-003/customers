@@ -270,6 +270,43 @@ class TestYourResourceService(TestCase):
         for customer in data:
             self.assertEqual(customer["email"], test_email)
 
+    # ----------------------------------------------------------
+    # TEST: ACTION ENDPOINT - SUSPEND
+    # ----------------------------------------------------------
+    def test_action_customer_suspend(self):
+        """It should perform the suspend action on a customer"""
+        # Create a test customer
+        test_customer = self._create_customers(1)[0]
+        # Perform the suspend action
+        response = self.client.post(
+            f"{BASE_URL}/{test_customer.id}/action",
+            json={"action": "suspend"}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data.get("action"), "suspended")
+        self.assertEqual(data.get("id"), test_customer.id)
+        self.assertEqual(data.get("name"), test_customer.name)
+        self.assertEqual(data.get("address"), test_customer.address)
+        self.assertEqual(data.get("email"), test_customer.email)
+        self.assertEqual(data.get("phonenumber"), test_customer.phonenumber)
+
+    # ----------------------------------------------------------
+    # TEST: ACTION ENDPOINT - UNSUPPORTED ACTION
+    # ----------------------------------------------------------
+    def test_action_customer_invalid_action(self):
+        """It should return an error for an unsupported action on a customer"""
+        # Create a test customer
+        test_customer = self._create_customers(1)[0]
+        # Attempt an unsupported action
+        response = self.client.post(
+            f"{BASE_URL}/{test_customer.id}/action",
+            json={"action": "invalid_action"}
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        data = response.get_json()
+        self.assertIn("not supported", data.get("message", ""))
+
 
 ######################################################################
 #  T E S T   S A D   P A T H S

@@ -233,3 +233,42 @@ def delete_customers(customer_id):
 
     app.logger.info("Customer with ID: %d delete complete.", customer_id)
     return {}, status.HTTP_204_NO_CONTENT
+
+
+######################################################################
+# ACTION ENDPOINT: PERFORM AN ACTION ON A CUSTOMER
+######################################################################
+
+
+@app.route("/customers/<int:customer_id>/action", methods=["POST"])
+def action_customer(customer_id):
+    """
+    Perform an action on a customer record.
+    Supported action: suspend
+
+    Example Request JSON:
+    {
+      "action": "suspend"
+    }
+    """
+    app.logger.info("Performing action on customer with id [%s]", customer_id)
+    check_content_type("application/json")
+
+    customer = Customer.find(customer_id)
+    if not customer:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Customer with id '{customer_id}' not found."
+        )
+
+    data = request.get_json()
+    action = data.get("action", "").lower() if data else ""
+
+    if action == "suspend":
+        app.logger.info("Suspending customer with id [%s]", customer_id)
+        result = customer.serialize()
+        result["action"] = "suspended"
+        return jsonify(result), status.HTTP_200_OK
+    abort(
+        status.HTTP_400_BAD_REQUEST,
+        f"Action '{action}' is not supported.")
