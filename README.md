@@ -1,3 +1,6 @@
+
+[![codecov](https://codecov.io/gh/CSCI-GA-2820-SP25-003/customers/graph/badge.svg?token=92SBP8I9EC)](https://codecov.io/gh/CSCI-GA-2820-SP25-003/customers)
+
 # Customer REST API Service
 
 A Flask-based REST API that allows you to create, read, update, and delete customer records. This service uses SQLAlchemy as the ORM to interact with the database.
