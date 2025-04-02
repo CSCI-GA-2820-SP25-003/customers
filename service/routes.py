@@ -241,35 +241,28 @@ def delete_customers(customer_id):
 def action_customer(customer_id):
     """
     Perform an action on a customer record.
-    Supported actions: suspend
+    Supported action: suspend
 
     Example Request JSON:
     {
       "action": "suspend"
     }
     """
-    app.logger.info("Request to perform an action on customer with id [%s]", customer_id)
-    # Ensure the request has the correct content type
+    app.logger.info("Performing action on customer with id [%s]", customer_id)
     check_content_type("application/json")
-    
-    # Lookup the customer
+
     customer = Customer.find(customer_id)
     if not customer:
         abort(
             status.HTTP_404_NOT_FOUND,
-            f"Customer with id '{customer_id}' was not found."
+            f"Customer with id '{customer_id}' not found."
         )
-    
-    # Get the action from the JSON body
+
     data = request.get_json()
     action = data.get("action", "").lower() if data else ""
-    
-    # Process the supported action(s)
+
     if action == "suspend":
         app.logger.info("Suspending customer with id [%s]", customer_id)
-        # Here you would update a status flag in the database
-        # e.g., customer.status = "suspended" followed by customer.update()
-        # For now we simulate the action by returning the customer data with an action key.
         result = customer.serialize()
         result["action"] = "suspended"
         return jsonify(result), status.HTTP_200_OK
@@ -278,4 +271,3 @@ def action_customer(customer_id):
             status.HTTP_400_BAD_REQUEST,
             f"Action '{action}' is not supported."
         )
-
