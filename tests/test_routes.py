@@ -289,6 +289,14 @@ class TestYourResourceService(TestCase):
         self.assertEqual(data.get("phonenumber"), test_customer.phonenumber)
 
     # ----------------------------------------------------------
+    # TEST: ACTION ENDPOINT - ID NOT FOUND
+    # ----------------------------------------------------------
+    def test_action_customer_id_not_found(self):
+        """It should return an error for a customer id that doesn't exist"""
+        response = self.client.post(f"{BASE_URL}/0/action", json={"action": "suspend"})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    # ----------------------------------------------------------
     # TEST: ACTION ENDPOINT - UNSUPPORTED ACTION
     # ----------------------------------------------------------
     def test_action_customer_invalid_action(self):
