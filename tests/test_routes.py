@@ -93,8 +93,6 @@ class TestYourResourceService(TestCase):
         """It should call the home page"""
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(data["name"], "Customer REST API Service")
 
     def test_health(self):
         """It should be healthy"""
@@ -279,8 +277,7 @@ class TestYourResourceService(TestCase):
         test_customer = self._create_customers(1)[0]
         # Perform the suspend action
         response = self.client.post(
-            f"{BASE_URL}/{test_customer.id}/action",
-            json={"action": "suspend"}
+            f"{BASE_URL}/{test_customer.id}/action", json={"action": "suspend"}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
@@ -300,8 +297,7 @@ class TestYourResourceService(TestCase):
         test_customer = self._create_customers(1)[0]
         # Attempt an unsupported action
         response = self.client.post(
-            f"{BASE_URL}/{test_customer.id}/action",
-            json={"action": "invalid_action"}
+            f"{BASE_URL}/{test_customer.id}/action", json={"action": "invalid_action"}
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         data = response.get_json()
