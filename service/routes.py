@@ -42,15 +42,7 @@ def health_check():
 @app.route("/")
 def index():
     """Root URL response"""
-    app.logger.info("Request for Root URL")
-    return (
-        jsonify(
-            name="Customer REST API Service",
-            version="1.0",
-            paths=url_for("list_customers", _external=True),
-        ),
-        status.HTTP_200_OK,
-    )
+    return app.send_static_file("index.html")
 
 
 ######################################################################
@@ -256,10 +248,7 @@ def action_customer(customer_id):
 
     customer = Customer.find(customer_id)
     if not customer:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Customer with id '{customer_id}' not found."
-        )
+        abort(status.HTTP_404_NOT_FOUND, f"Customer with id '{customer_id}' not found.")
 
     data = request.get_json()
     action = data.get("action", "").lower() if data else ""
@@ -269,6 +258,4 @@ def action_customer(customer_id):
         result = customer.serialize()
         result["action"] = "suspended"
         return jsonify(result), status.HTTP_200_OK
-    abort(
-        status.HTTP_400_BAD_REQUEST,
-        f"Action '{action}' is not supported.")
+    abort(status.HTTP_400_BAD_REQUEST, f"Action '{action}' is not supported.")
