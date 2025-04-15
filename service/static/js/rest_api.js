@@ -10,7 +10,7 @@ $(function () {
         $("#customer_name").val(res.name);
         $("#customer_address").val(res.address);
         $("#customer_email").val(res.email);
-        $("#customer_phone").val(res.phonenumber);
+        $("#customer_phonenumbernumber").val(res.phonenumber);
     }
 
     /// Clears all form fields
@@ -18,7 +18,7 @@ $(function () {
         $("#customer_name").val("");
         $("#customer_address").val("");
         $("#customer_email").val("");
-        $("#customer_phone").val("");
+        $("#customer_phonenumbernumber").val("");
     }
 
     // Updates the flash message area
@@ -36,7 +36,7 @@ $(function () {
         let name = $("#customer_name").val();
         let address = $("#customer_address").val();
         let email = $("#customer_email").val();
-        let phone = $("#customer_phone").val();
+        let phone = $("#customer_phonenumber").val();
 
         let data = {
             "name": name,
@@ -75,7 +75,7 @@ $(function () {
         let name = $("#customer_name").val();
         let address = $("#customer_address").val();
         let email = $("#customer_email").val();
-        let phone = $("#customer_phone").val();
+        let phone = $("#customer_phonenumber").val();
 
         let data = {
             "name": name,
@@ -180,7 +180,7 @@ $(function () {
         let name = $("#customer_name").val();
         let address = $("#customer_address").val();
         let email = $("#customer_email").val();
-        let phone = $("#customer_phone").val();
+        let phone = $("#customer_phonenumber").val();
 
         let queryString = ""
 
