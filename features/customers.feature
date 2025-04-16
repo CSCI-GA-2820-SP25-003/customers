@@ -36,3 +36,21 @@ Scenario: Create a Customer
     And I should see "50 Broadway St" in the "Address" field
     And I should see "eileen@gmail.com" in the "Email" field
     And I should see "999-888-7777" in the "Phonenumber" field
+
+Scenario: Query a Customer by Name
+    When I visit the "Home Page"
+    And I set the "Name" to "Albert"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Albert" in the "Name" field
+    And I should see "4000 Penn Ave" in the "Address" field
+    And I should not see "Ben" in the results
+
+Scenario: Query a Customer by Email
+    When I visit the "Home Page"
+    And I set the "email" to "ben@outlook.com "
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Ben" in the "Name" field
+    And I should see "44 West 4th St" in the "Address" field
+    And I should not see "Albert" in the results
