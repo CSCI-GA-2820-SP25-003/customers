@@ -10,7 +10,7 @@ $(function () {
         $("#customer_name").val(res.name);
         $("#customer_address").val(res.address);
         $("#customer_email").val(res.email);
-        $("#customer_phonenumbernumber").val(res.phonenumber);
+        $("#customer_phonenumber").val(res.phonenumber);
     }
 
     /// Clears all form fields
@@ -18,7 +18,7 @@ $(function () {
         $("#customer_name").val("");
         $("#customer_address").val("");
         $("#customer_email").val("");
-        $("#customer_phonenumbernumber").val("");
+        $("#customer_phonenumber").val("");
     }
 
     // Updates the flash message area
