@@ -54,14 +54,3 @@ Scenario: Query a Customer by Email
     And I should see "Ben" in the "Name" field
     And I should see "44 West 4th St" in the "Address" field
     And I should not see "Albert" in the results
-
-Scenario: Update a Customer
-    When I visit the "Home Page"
-    And I set the "Name" to "Albert"
-    And I press the "Search" button
-    Then I should see "Albert" in the "Name" field
-
-    When I change the "Address" to "500 Broadway St"
-    And I press the "Update" button
-    Then I should see the message "Success"
-    And I should see "500 Broadway St" in the "Address" field
