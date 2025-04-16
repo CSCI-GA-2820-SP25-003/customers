@@ -54,3 +54,12 @@ Scenario: Query a Customer by Email
     And I should see "Ben" in the "Name" field
     And I should see "44 West 4th St" in the "Address" field
     And I should not see "Albert" in the results
+
+Scenario: List all customers
+    When I visit the "Home Page"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Albert" in the results
+    And I should see "Ben" in the results
+    And I should see "Carol" in the results
+    And I should see "Shmoo Moo" in the results
