@@ -182,7 +182,7 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/customers/${customer_id}`,
+                url: "/customers/" + customer_id + "/suspend",
                 contentType: "application/json"
             })
 

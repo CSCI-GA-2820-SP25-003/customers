@@ -30,6 +30,7 @@ class Customer(db.Model):
     address = db.Column(db.String(256))
     email = db.Column(db.String(50))
     phonenumber = db.Column(db.String(25))
+    blocked = db.Column(db.Boolean())
 
     def __repr__(self):
         return f"<Customer {self.name} id=[{self.id}]>"
@@ -81,6 +82,7 @@ class Customer(db.Model):
             "address": self.address,
             "email": self.email,
             "phonenumber": self.phonenumber,
+            "blocked": self.blocked,
         }
 
     def deserialize(self, data):
@@ -114,6 +116,12 @@ class Customer(db.Model):
                     "Invalid type for [phonenumber]: " + str(type(data["phonenumber"]))
                 )
             self.phonenumber = data["phonenumber"]
+
+            if not isinstance(data["blocked"], str):
+                raise DataValidationError(
+                    "Invalid type for [blocked]: " + str(type(data["blocked"]))
+                )
+            self.blocked = data["blocked"]
 
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
