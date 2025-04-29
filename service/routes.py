@@ -21,6 +21,7 @@ This service implements a REST API that allows you to Create, Read, Update
 and Delete Customer
 """
 
+from flask import abort
 from flask import current_app as app  # Import Flask application
 from flask_restx import Resource, fields, reqparse, Api
 from service.models import Customer
@@ -314,12 +315,3 @@ class SuspendResource(Resource):
             return result, status.HTTP_200_OK
 
         api.abort(status.HTTP_400_BAD_REQUEST, f"Action '{action}' is not supported.")
-
-
-######################################################################
-# U T I L I T Y     F U N C T I O N S
-######################################################################
-def abort(error_code: int, message: str):
-    """Logs errors before aborting"""
-    app.logger.error(message)
-    api.abort(error_code, message)
