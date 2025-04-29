@@ -129,6 +129,8 @@ class TestCustomer(TestCase):
         self.assertEqual(data["address"], customer.address)
         self.assertIn("phonenumber", data)
         self.assertEqual(data["phonenumber"], customer.phonenumber)
+        self.assertIn("suspended", data)
+        self.assertEqual(data["suspended"], customer.suspended)
 
     def test_deserialize_a_customer(self):
         """It should de-serialize a customer"""
@@ -141,6 +143,7 @@ class TestCustomer(TestCase):
         self.assertEqual(customer.address, data["address"])
         self.assertEqual(customer.email, data["email"])
         self.assertEqual(customer.phonenumber, data["phonenumber"])
+        self.assertEqual(customer.suspended, data.get("suspended", False))
 
     def test_deserialize_missing_data(self):
         """It should not deserialize a Customer with missing data"""
@@ -186,6 +189,15 @@ class TestCustomer(TestCase):
         self.assertEqual(len(customers), 1)
         self.assertEqual(customers[0].id, original_id)
         self.assertEqual(customers[0].name, "John Doe")
+        
+    def test_suspend_field(self):
+        """It should store and retrieve suspended state properly"""
+        customer = CustomerFactory()
+        customer.suspended = True
+        customer.create()
+
+        found = Customer.find(customer.id)
+        self.assertTrue(found.suspended)
 
     def test_update_no_id(self):
         """It should not Update a Customer with no id"""

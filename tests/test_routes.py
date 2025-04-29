@@ -287,6 +287,10 @@ class TestYourResourceService(TestCase):
         self.assertEqual(data.get("address"), test_customer.address)
         self.assertEqual(data.get("email"), test_customer.email)
         self.assertEqual(data.get("phonenumber"), test_customer.phonenumber)
+        
+        # Check that the customer is actually suspended in the database
+        customer = Customer.find(test_customer.id)
+        self.assertTrue(customer.suspended)
 
     # ----------------------------------------------------------
     # TEST: ACTION ENDPOINT - ID NOT FOUND

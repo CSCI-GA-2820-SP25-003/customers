@@ -255,6 +255,8 @@ def action_customer(customer_id):
 
     if action == "suspend":
         app.logger.info("Suspending customer with id [%s]", customer_id)
+        customer.suspended = True
+        customer.update()
         result = customer.serialize()
         result["action"] = "suspended"
         return jsonify(result), status.HTTP_200_OK

@@ -6,6 +6,7 @@ All of the models are stored in this module
 
 import logging
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Boolean
 
 logger = logging.getLogger("flask.app")
 
@@ -30,6 +31,7 @@ class Customer(db.Model):
     address = db.Column(db.String(256))
     email = db.Column(db.String(50))
     phonenumber = db.Column(db.String(25))
+    suspended = db.Column(Boolean, default=False)
 
     def __repr__(self):
         return f"<Customer {self.name} id=[{self.id}]>"
@@ -81,6 +83,7 @@ class Customer(db.Model):
             "address": self.address,
             "email": self.email,
             "phonenumber": self.phonenumber,
+            "suspended": self.suspended,
         }
 
     def deserialize(self, data):
@@ -114,6 +117,14 @@ class Customer(db.Model):
                     "Invalid type for [phonenumber]: " + str(type(data["phonenumber"]))
                 )
             self.phonenumber = data["phonenumber"]
+            
+            # Optional field: suspended
+            suspended_value = data.get("suspended", False)
+            if not isinstance(suspended_value, bool):
+                raise DataValidationError(
+                    "Invalid type for [suspended]: " + str(type(suspended_value))
+                )
+            self.suspended = suspended_value
 
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
