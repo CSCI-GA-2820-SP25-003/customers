@@ -314,4 +314,5 @@ class ActionResource(Resource):
             result["action"] = "suspended"
             return result, status.HTTP_200_OK
 
-        api.abort(status.HTTP_400_BAD_REQUEST, f"Action '{action}' is not supported.")
+        # api.abort(status.HTTP_400_BAD_REQUEST, f"Action '{action}' is not supported.")
+        raise ValueError(f"Action '{action}' is not supported.")
