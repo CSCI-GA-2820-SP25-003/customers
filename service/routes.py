@@ -289,7 +289,7 @@ class ActionResource(Resource):
     @api.response(404, "Customer not found")
     @api.response(400, "The posted data was not valid")
     @api.expect(action_model)
-    def post(self, customer_id):
+    def post(self, customer_id):  # pylint: disable=inconsistent-return-statements
         """
         Perform an action on a Customer
         This endpoint will perform a suspend on a Customer
