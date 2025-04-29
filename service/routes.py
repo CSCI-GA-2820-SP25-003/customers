@@ -1,19 +1,3 @@
-######################################################################
-# Copyright 2016, 2024 John J. Rofrano. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-######################################################################
-
 """
 Customer Service with Swagger
 
@@ -38,7 +22,7 @@ api = Api(
     description="This is a Customer server.",
     default="customers",
     default_label="Customer service operations",
-    doc="/apidocs",  # default also could use doc='/apidocs/'
+    doc="/apidocs",
     prefix="/api",
 )
 
@@ -80,7 +64,7 @@ create_model = api.model(
             description="The address of of the customer.",
             example="nyu101",
         ),
-        "phonenumber": fields.Integer(
+        "phonenumber": fields.String(
             required=True,
             description="The phonenumber of the customer",
             example="9999999999",
@@ -100,7 +84,19 @@ customer_model = api.inherit(
     },
 )
 
-# query string arguments
+# Action model for the action endpoint
+action_model = api.model(
+    "Action",
+    {
+        "action": fields.String(
+            required=True,
+            description="The action to perform",
+            example="suspend",
+        ),
+    },
+)
+
+# Query string arguments
 customer_args = reqparse.RequestParser()
 customer_args.add_argument(
     "customer_id",
@@ -143,7 +139,7 @@ class CustomerResource(Resource):
     Allows the manipulation of a single Customer
     GET /customer{id} - Returns a Customer with the id
     PUT /customer{id} - Update a Customer with the id
-    DELETE /customer{id} -  Deletes a Customer with the id
+    DELETE /customer{id} - Deletes a Customer with the id
     """
 
     # ------------------------------------------------------------------
@@ -211,7 +207,6 @@ class CustomerResource(Resource):
         if customer:
             customer.delete()
             app.logger.info("Customer with id [%s] was deleted", customer_id)
-
         return "", status.HTTP_204_NO_CONTENT
 
 
@@ -236,7 +231,8 @@ class CustomerCollection(Resource):
 
         if args["customer_id"]:
             app.logger.info("Filtering by customer id: %s", args["customer_id"])
-            customers = Customer.find(args["customer_id"])
+            customer = Customer.find(args["customer_id"])
+            customers = [customer] if customer else []
         elif args["name"]:
             app.logger.info("Filtering by name: %s", args["name"])
             customers = Customer.find_by_name(args["name"])
@@ -282,22 +278,26 @@ class CustomerCollection(Resource):
 
 
 ######################################################################
-#  PATH: /customers/{id}/suspend
+#  PATH: /customers/{id}/action
 ######################################################################
 @api.route("/customers/<customer_id>/action")
 @api.param("customer_id", "The Customer identifier")
-class SuspendResource(Resource):
-    """Suspend action on a Customer"""
+class ActionResource(Resource):
+    """Perform actions on a Customer"""
 
-    @api.doc("suspend_customers")
+    @api.doc("action_customers")
     @api.response(404, "Customer not found")
-    def put(self, customer_id):
+    @api.response(400, "The posted data was not valid")
+    @api.expect(action_model)
+    def post(self, customer_id):
         """
-        Suspend a Customer
+        Perform an action on a Customer
 
-        This endpoint will suspend a Customer and make it unavailable
+        This endpoint will perform an action (e.g., suspend) on a Customer
         """
-        app.logger.info("Request to Suspend a Customer")
+        app.logger.info(
+            "Request to Perform action on Customer with id [%s]", customer_id
+        )
         customer = Customer.find(customer_id)
         if not customer:
             abort(
@@ -306,7 +306,7 @@ class SuspendResource(Resource):
             )
 
         data = api.payload
-        action = data.get("action", "").lower() if data else ""
+        action = data.get("action", "").lower()
 
         if action == "suspend":
             app.logger.info("Suspending customer with id [%s]", customer_id)
