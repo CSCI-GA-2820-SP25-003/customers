@@ -235,16 +235,16 @@ class CustomerCollection(Resource):
             customers = [customer] if customer else []
         elif args["name"]:
             app.logger.info("Filtering by name: %s", args["name"])
-            customers = Customer.find_by_name(args["name"])
+            customers = Customer.find_by_name(args["name"]).all()
         elif args["address"]:
             app.logger.info("Filtering by address: %s", args["address"])
-            customers = Customer.find_by_address(args["address"])
+            customers = Customer.find_by_address(args["address"]).all()
         elif args["email"]:
             app.logger.info("Filtering by email: %s", args["email"])
-            customers = Customer.find_by_email(args["email"])
+            customers = Customer.find_by_email(args["email"]).all()
         elif args["phonenumber"]:
             app.logger.info("Filtering by phonenumber: %s", args["phonenumber"])
-            customers = Customer.find_by_phonenumber(args["phonenumber"])
+            customers = Customer.find_by_phonenumber(args["phonenumber"]).all()
         else:
             app.logger.info("Returning unfiltered list.")
             customers = Customer.all()
@@ -292,8 +292,7 @@ class ActionResource(Resource):
     def post(self, customer_id):
         """
         Perform an action on a Customer
-
-        This endpoint will perform an action (e.g., suspend) on a Customer
+        This endpoint will perform a suspend on a Customer
         """
         app.logger.info(
             "Request to Perform action on Customer with id [%s]", customer_id
@@ -314,5 +313,4 @@ class ActionResource(Resource):
             result["action"] = "suspended"
             return result, status.HTTP_200_OK
 
-        # api.abort(status.HTTP_400_BAD_REQUEST, f"Action '{action}' is not supported.")
-        raise ValueError(f"Action '{action}' is not supported.")
+        api.abort(status.HTTP_400_BAD_REQUEST, f"Action '{action}' is not supported.")
