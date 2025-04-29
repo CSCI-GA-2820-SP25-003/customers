@@ -79,3 +79,15 @@ Scenario: Delete a Customer
     When I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see the message "404 Not Found"
+
+Scenario: Block a Customer
+    When I visit the "Home Page"
+    And I press the "search" button
+    Then I should see "Yes" in the "Blocked" dropdown
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Suspend" button
+    Then I should see the message "You successfully suspended the customer!"
+    When I press the "Retrieve" button
+    Then I should see "False" in the "Active" dropdown

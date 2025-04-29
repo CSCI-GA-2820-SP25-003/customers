@@ -11,6 +11,12 @@ $(function () {
         $("#customer_address").val(res.address);
         $("#customer_email").val(res.email);
         $("#customer_phonenumber").val(res.phonenumber);
+        if (res.blocked == true) {
+            $("#customer_active").val("true");
+        } else {
+            $("#customer_active").val("false");
+        }
+        //$("#customer_active").val(res.blocked);
     }
 
     /// Clears all form fields
@@ -19,6 +25,7 @@ $(function () {
         $("#customer_address").val("");
         $("#customer_email").val("");
         $("#customer_phonenumber").val("");
+        $("#customer_active").val("");
     }
 
     // Updates the flash message area
@@ -37,12 +44,14 @@ $(function () {
         let address = $("#customer_address").val();
         let email = $("#customer_email").val();
         let phone = $("#customer_phonenumber").val();
+        let customer_active = $("#customer_active").val() == "true";
 
         let data = {
             "name": name,
             "address": address,
             "email": email,
-            "phonenumber": phone
+            "phonenumber": phone,
+            "blocked": customer_active
         };
 
         $("#flash_message").empty();
@@ -76,12 +85,14 @@ $(function () {
         let address = $("#customer_address").val();
         let email = $("#customer_email").val();
         let phone = $("#customer_phonenumber").val();
+        let customer_active = ($("#customer_active").val() === "true");
 
         let data = {
             "name": name,
             "address": address,
             "email": email,
-            "phonenumber": phone
+            "phonenumber": phone,
+            "blocked": customer_active
         };
 
         $("#flash_message").empty();
@@ -162,6 +173,31 @@ $(function () {
     });
 
     // ****************************************
+    // Block a Customer
+    // ****************************************
+
+    $("#suspend-btn").click(function () {
+        let customer_id = $("#customer_id").val();
+
+
+        let ajax = $.ajax({
+                type: "PUT",
+                url: `/customers/${customer_id}`,
+                contentType: "application/json"
+            })
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("You successfully blocked the customer!")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
     // Clear the form
     // ****************************************
 
@@ -181,6 +217,7 @@ $(function () {
         let address = $("#customer_address").val();
         let email = $("#customer_email").val();
         let phone = $("#customer_phonenumber").val();
+        let customer_active = $("#customer_active").val();
 
         let queryString = ""
 
@@ -208,7 +245,10 @@ $(function () {
                 queryString += 'phonenumber=' + phone
             }
         }
-        $("#flash_message").empty();
+
+        if (customer_active != null) { 
+            queryString = "?blocked=" + customer_active; }
+        //$("#flash_message").empty();
 
         let ajax = $.ajax({
             type: "GET",
@@ -227,11 +267,12 @@ $(function () {
             table += '<th class="col-md-2">Address</th>'
             table += '<th class="col-md-2">Email</th>'
             table += '<th class="col-md-2">Phone</th>'
+            table += '<th class="col-md-2">Blocked</th>'
             table += '</tr></thead><tbody>'
             let firstCustomer = "";
             for(let i = 0; i < res.length; i++) {
                 let customer = res[i];
-                table +=  `<tr id="row_${i}"><td>${customer.id}</td><td>${customer.name}</td><td>${customer.address}</td><td>${customer.email}</td><td>${customer.phonenumber}</td></tr>`;
+                table +=  `<tr id="row_${i}"><td>${customer.id}</td><td>${customer.name}</td><td>${customer.address}</td><td>${customer.email}</td><td>${customer.phonenumber}</td><td>${customer.blocked}</td></tr>`;
                 if (i == 0) {
                     firstCustomer = customer;
                 }

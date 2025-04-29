@@ -52,6 +52,7 @@ def step_impl(context):
             "address": row["address"],
             "email": row["email"],
             "phonenumber": row["phonenumber"],
+            "blocked": row["blocked"],
         }
         context.resp = requests.post(rest_endpoint, json=payload)
         assert context.resp.status_code == HTTP_201_CREATED
