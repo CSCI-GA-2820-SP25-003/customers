@@ -11,6 +11,15 @@
 #       description: The reference (branch or ref)
 #       name: GIT_REF
 #       type: string
+#     - default: customers
+#       description: Name of the application
+#       name: APP_NAME
+#       type: string
+#     - default: >-
+#         image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/$(params.APP_NAME):latest
+#       description: he name of the image to build
+#       name: IMAGE_NAME
+#       type: string
 #   tasks:
 #     - name: git-clone
 #       params:
@@ -43,7 +52,8 @@
 #         - name: verbose
 #           value: 'true'
 #         - name: gitInitImage
-#           value: 'gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.40.2'
+#           value: >-
+#             gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.40.2
 #         - name: userHome
 #           value: /home/git
 #       taskRef:
@@ -86,9 +96,42 @@
 #       workspaces:
 #         - name: source
 #           workspace: pipeline-workspace
+#     - name: buildah
+#       params:
+#         - name: IMAGE
+#           value: $(params.IMAGE_NAME)
+#         - name: DOCKERFILE
+#           value: ./Dockerfile
+#         - name: BUILD_ARGS
+#           value: []
+#         - name: CONTEXT
+#           value: .
+#         - name: STORAGE_DRIVER
+#           value: vfs
+#         - name: FORMAT
+#           value: oci
+#         - name: BUILD_EXTRA_ARGS
+#           value: ''
+#         - name: PUSH_EXTRA_ARGS
+#           value: ''
+#         - name: SKIP_PUSH
+#           value: 'false'
+#         - name: TLS_VERIFY
+#           value: 'true'
+#         - name: VERBOSE
+#           value: 'false'
+#       runAfter:
+#         - pylint
+#         - pytest
+#       taskRef:
+#         kind: Task
+#         name: buildah
+#       workspaces:
+#         - name: source
+#           workspace: pipeline-workspace
 #   workspaces:
 #     - name: pipeline-workspace
-
+#       optional: false
 
 apiVersion: tekton.dev/v1
 kind: Pipeline
@@ -221,6 +264,21 @@ spec:
       workspaces:
         - name: source
           workspace: pipeline-workspace
+    - name: deploy-image
+      params:
+        - name: image-name
+          value: $(params.IMAGE_NAME)
+        - name: manifest-dir
+          value: k8s
+      runAfter:
+        - buildah
+      taskRef:
+        kind: Task
+        name: deploy-image
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
   workspaces:
     - name: pipeline-workspace
       optional: false
+  finally: []
