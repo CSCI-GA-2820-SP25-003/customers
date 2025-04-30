@@ -42,7 +42,7 @@ spec:
                     key: postgres_db
           volumeMounts:
           - name: postgres-storage
-            mountPath: /var/lib/postgres
+            mountPath: /var/lib/postgresql
           resources:
             limits:
               cpu: "0.50"
